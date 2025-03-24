@@ -6,7 +6,7 @@ namespace ChatSupportAPI.Services;
 
 public class ChatSupportEngine : IChatSupportEngine
 {
-    private List<Chat> ChatQueue { get; set; }
+    private List<ChatSession> ChatQueue { get; set; }
     private List<Agent> AgentList { get; set; }
 
     private int _teamCapacity;
@@ -17,14 +17,15 @@ public class ChatSupportEngine : IChatSupportEngine
 
     public ChatSupportEngine(IOptions<ChatSupportSettings> settings)
     {
-        _chatRetryPolicyInSeconds = settings.Value.ChatRetryPolicy_InSeconds;
+        _chatRetryPolicyInSeconds = settings.Value.PeriodicRun_InSeconds;
 
-        ChatQueue = new List<Chat>();
+        ChatQueue = new List<ChatSession>();
 
         // for testing purposes
         _currentWorkShift = WorkShift.Day;
-
+        // uncomment this to get the correct workshift based on current time
         //_currentWorkShift = DateTime.Now.ToWorkShift();
+
         AgentList = Constants.Teams.First(x => x.Shift == _currentWorkShift)
             .Agents.OrderBy(x => x.Seniority).ToList();
 
@@ -46,7 +47,7 @@ public class ChatSupportEngine : IChatSupportEngine
             if (chat.Retry > 3)
             {
                 ChatQueue.Remove(chat);
-                AgentList.Single(x => x.Name == chat.AssignedAgent).CurrentChatCount -= 1;
+                AgentList.First(x => x.Name == chat.AssignedAgent).CurrentChatCount -= 1;
             }
         }
 
@@ -76,13 +77,11 @@ public class ChatSupportEngine : IChatSupportEngine
         {
             agent.Assignable = false;
         }
-        
-        AgentList.Clear();
 
-        AgentList = nextWorkShiftTeam.Agents.Concat(agentsWithOnGoingChats).ToList();
+        AgentList = new List<Agent>(nextWorkShiftTeam.Agents.Concat(agentsWithOnGoingChats));
         _teamCapacity = AgentList.Where(x => x.Assignable).Sum(x => x.Capacity);
         _queueCapacity = Convert.ToInt32(_teamCapacity * 1.5);
-        
+
     }
 
     // stats
@@ -109,7 +108,7 @@ public class ChatSupportEngine : IChatSupportEngine
             return "The chat is refused.";
         }
 
-        var chat = new Chat(name);
+        var chat = new ChatSession(name);
 
         chat.AssignedAgent = GetNextAvailableAgent();
 
@@ -117,7 +116,7 @@ public class ChatSupportEngine : IChatSupportEngine
 
         return chat.SessionId;
     }
-    public Chat SendChat(string sessionId, string message)
+    public ChatSession SendChat(string sessionId, string message)
     {
         var chat = ChatQueue.FirstOrDefault(x => x.SessionId == sessionId);
 
@@ -132,16 +131,16 @@ public class ChatSupportEngine : IChatSupportEngine
         }
 
         chat.Retry = 0;
-        chat.Lifetime = DateTimeOffset.Now;
+        chat.Lifetime = DateTime.Now;
         chat.Conversation.Add($"You: {message}");
 
         return chat;
     }
-    public Chat? GetChat(string sessionId)
+    public ChatSession? GetChat(string sessionId)
     {
         return ChatQueue.FirstOrDefault(x => x.SessionId == sessionId);
     }
-    public Chat? DisconnectChat(string sessionId)
+    public ChatSession? DisconnectChat(string sessionId)
     {
         var chat = ChatQueue.FirstOrDefault(x => x.SessionId == sessionId);
         if (chat != null)

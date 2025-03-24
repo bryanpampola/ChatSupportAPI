@@ -19,7 +19,7 @@ public class PeriodicHostedService : BackgroundService
     {
         _logger = logger;
         _factory = factory;
-        _period = TimeSpan.FromSeconds(settings.Value.ChatRetryPolicy_InSeconds);
+        _period = TimeSpan.FromSeconds(settings.Value.PeriodicRun_InSeconds);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

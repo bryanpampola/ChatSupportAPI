@@ -11,13 +11,16 @@ public class Agent
     public int CurrentChatCount { get; set; }
     public bool Assignable { get; set; }
 
+    public List<ChatSession> Chats { get; set; }
 
-    public Agent(string name, Seniority seniority)
+    public Agent(string name, Seniority seniority, string nickName = "")
     {
         Name = name;
         Seniority = seniority;
         Capacity = SetCapacity(seniority);
         Assignable = true;
+        NickName = nickName;
+        Chats = new List<ChatSession>();
     }
 
     private int SetCapacity(Seniority seniority)

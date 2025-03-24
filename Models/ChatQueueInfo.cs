@@ -8,6 +8,6 @@ public sealed record ChatQueueInfo
     public int TotalAgents { get; set; }
     public int TotalChatCount { get; set; }
     public int OnWaitingQueue { get; set; }
-    public List<Chat> Chats { get; set; }
+    public List<ChatSession> Chats { get; set; }
     public List<Agent> Agents { get; set; }
 }

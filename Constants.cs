@@ -18,31 +18,31 @@ public static class Constants
         
         public static List<Agent> TeamA => new List<Agent>
         {
-            new Agent("TeamLeadA", Seniority.TeamLead),
-            new Agent("MidLevelA1", Seniority.MidLevel),
-            new Agent("MidLevelA2", Seniority.MidLevel),
-            new Agent("JuniorA", Seniority.Junior)
+            new Agent("TeamLeadA", Seniority.TeamLead, "Andrew"),
+            new Agent("MidLevelA1", Seniority.MidLevel, "Alisha"),
+            new Agent("MidLevelA2", Seniority.MidLevel, "Anna"),
+            new Agent("JuniorA", Seniority.Junior, "Albert")
         };
         public static List<Agent> TeamB => new List<Agent>
         {
-            new Agent("SeniorB", Seniority.Senior),
-            new Agent("MidLevelB", Seniority.MidLevel),
-            new Agent("JuniorB1", Seniority.Junior),
-            new Agent("JuniorB2", Seniority.Junior)
+            new Agent("SeniorB", Seniority.Senior, "Bryan"),
+            new Agent("MidLevelB", Seniority.MidLevel, "Ben"),
+            new Agent("JuniorB1", Seniority.Junior, "Belinda"),
+            new Agent("JuniorB2", Seniority.Junior, "Brenda")
         };
         public static List<Agent> TeamC => new List<Agent>
         {
-            new Agent("MidLevelC1", Seniority.MidLevel),
-            new Agent("MidLevelC2", Seniority.MidLevel)
+            new Agent("MidLevelC1", Seniority.MidLevel, "Catherine"),
+            new Agent("MidLevelC2", Seniority.MidLevel, "Charles")
         };
         public static List<Agent> TeamOverflow => new List<Agent>
         {
-            new Agent("Overflow1", Seniority.Junior),
-            new Agent("Overflow2", Seniority.Junior),
-            new Agent("Overflow3", Seniority.Junior),
-            new Agent("Overflow4", Seniority.Junior),
-            new Agent("Overflow5", Seniority.Junior),
-            new Agent("Overflow6", Seniority.Junior)
+            new Agent("Overflow1", Seniority.Junior, "O-One"),
+            new Agent("Overflow2", Seniority.Junior, "O-Two"),
+            new Agent("Overflow3", Seniority.Junior, "O-Three"),
+            new Agent("Overflow4", Seniority.Junior, "O-Four"),
+            new Agent("Overflow5", Seniority.Junior, "O-Five"),
+            new Agent("Overflow6", Seniority.Junior, "O-Six")
         };
     }
 }
@@ -83,4 +83,8 @@ public static class Extensions
             return WorkShift.Evening;
         }
     }
+
+    public static Team ToTeam(this WorkShift workShift) 
+        => Constants.Teams.First(x => x.Shift == workShift);
+
 }

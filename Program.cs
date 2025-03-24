@@ -9,6 +9,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IChatSupportEngine, ChatSupportEngine>();
 
+builder.Services.AddSingleton<IChatSupportService, ChatSupportService>();
+builder.Services.AddTransient<IChatQueueService, ChatQueueService>();
+builder.Services.AddTransient<IAgentCoordinatorService, AgentCoordinatorService>();
+
 builder.Services.AddSingleton<PeriodicHostedService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<PeriodicHostedService>());
 
@@ -24,19 +28,19 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // chat API
-app.MapGet("/monitor", (IChatSupportEngine engine)
+app.MapGet("/monitor", (IChatSupportService engine)
     => engine.GetInfo());
 
-app.MapPost("/chat", (string userName, IChatSupportEngine engine) 
-    => engine.StartChat(userName));
+app.MapPost("/chat", (string userName, IChatSupportService engine) 
+    => engine.NewChatSession(userName));
 
-app.MapGet("/chat", (string sessionId, IChatSupportEngine engine) 
-    => engine.GetChat(sessionId));
+//app.MapGet("/chat", (string sessionId, IChatSupportEngine engine) 
+//    => engine.GetChat(sessionId));
 
-app.MapPost("/chat/send", (string sessionId, string message, IChatSupportEngine engine) 
-    => engine.SendChat(sessionId, message));
+app.MapPost("/chat/send", (string sessionId, string message, IChatSupportService engine) 
+    => engine.SendMessage(sessionId, message));
 
-app.MapDelete("/chat", (string sessionId, IChatSupportEngine engine) => 
-    engine.DisconnectChat(sessionId));
+app.MapDelete("/chat", (string sessionId, IChatSupportService engine) => 
+    engine.EndChatSession(sessionId));
 
 app.Run();
