@@ -17,7 +17,8 @@ public class ChatSettings
 
 public class ChatQueueSettings
 {
-    public int Check_InSeconds { get; set; }
+    public int CheckLive_InSeconds { get; set; }
+    public int CheckExpired_InSeconds { get; set; }
 }
 
 public class ShiftSettings

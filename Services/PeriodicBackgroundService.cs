@@ -47,10 +47,11 @@ public class PeriodicHostedService : BackgroundService
                     // Create scope, so we get request services
                     await using AsyncServiceScope asyncScope = _factory.CreateAsyncScope();
 
-                    // Get service from scope
-                    var engine = asyncScope.ServiceProvider.GetRequiredService<IChatSupportEngine>();
-                    engine.PingCurrentChats();
-                    engine.ChangeShifts();
+                    //// Get service from scope
+                    var chatSupport = asyncScope.ServiceProvider.GetRequiredService<IChatSupportService>();
+                    chatSupport.Utility_PingLiveSessions();
+                    chatSupport.Utility_RemoveExpiredSessionOnQueue();
+                    chatSupport.Utility_AssignWaitingSessionOnQueue();
 
                     // Sample count increment
                     _executionCount++;

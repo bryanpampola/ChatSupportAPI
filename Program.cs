@@ -7,8 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<IChatSupportEngine, ChatSupportEngine>();
-
 builder.Services.AddSingleton<IChatSupportService, ChatSupportService>();
 builder.Services.AddTransient<IChatQueueService, ChatQueueService>();
 builder.Services.AddTransient<IAgentCoordinatorService, AgentCoordinatorService>();
@@ -34,11 +32,8 @@ app.MapGet("/monitor", (IChatSupportService engine)
 app.MapPost("/chat", (string userName, IChatSupportService engine) 
     => engine.NewChatSession(userName));
 
-//app.MapGet("/chat", (string sessionId, IChatSupportEngine engine) 
-//    => engine.GetChat(sessionId));
-
 app.MapPost("/chat/send", (string sessionId, string message, IChatSupportService engine) 
-    => engine.SendMessage(sessionId, message));
+    => engine.SendChatMessage(sessionId, message));
 
 app.MapDelete("/chat", (string sessionId, IChatSupportService engine) => 
     engine.EndChatSession(sessionId));
