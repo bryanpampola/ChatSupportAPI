@@ -73,14 +73,19 @@ public class AgentCoordinatorService : IAgentCoordinatorService
 
         return info;
     }
-    public void RemoveCurrentAgents()
+    public void SetAgentsUnassignable()
     {
-        var agentsWithOnGoingChats = Agents.Where(x => x.CurrentChatCount > 0).ToList();
-        agentsWithOnGoingChats.ForEach(x => x.Assignable = false);
-
-        Agents = agentsWithOnGoingChats;
+        Agents.ForEach(x => x.Assignable = false);
     }
+    public void RemoveUnassignableAgents()
+    {
+        if (Agents.All(x => x.Assignable)) return;
 
+        var inactiveAgents = Agents.Where(x => !x.Assignable && x.CurrentChatCount == 0).ToList();
+
+        Agents = Agents.Except(inactiveAgents).ToList();
+    }
+    
     private Agent? GetNextAvailableAgent()
     {
         var availableAgents = Agents.Where(x => x.Assignable && x.WithinCapacity())

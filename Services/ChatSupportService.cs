@@ -28,7 +28,18 @@ public class ChatSupportService : IChatSupportService
         _agentCoordinator = agentCoordinator;
         _supportQueue = supportQueue;
         _supportCoordinator = supportAgents;
+
+        BackgroundProcess_QueueCheckLive_LastRun = DateTime.Now;
+        BackgroundProcess_QueueCheckExpired_LastRun = DateTime.Now;
+        BackgroundProcess_ShiftChange_LastRun = DateTime.Now;
+
+        CurrentTeam = Enum.TryParse<WorkShift>(_settings.ShiftSettings.DefaultShift, out var shift) ? 
+            shift.ToTeam() : WorkShift.Day.ToTeam();
+
         SetupQueuesAndShifts();
+
+        _supportCoordinator.AddAgents(WorkShift.Custom.ToTeam().Agents);
+        _supportQueue.SetAgentsCapacity(_supportCoordinator.GetCapacity());
     }
 
     public List<string> GetInfo()
@@ -133,24 +144,25 @@ public class ChatSupportService : IChatSupportService
     }
     public void Utility_ChangeTeamBasedOnWorkshift()
     {
-
+        var lastRun = BackgroundProcess_ShiftChange_LastRun;
+        if (DateTime.Now >= lastRun.AddSeconds(_settings.ShiftSettings.CheckChange_InSeconds))
+        {
+            if (_settings.ShiftSettings.IsAutoAssign && 
+                CurrentTeam.Shift != DateTime.Now.ToWorkShift())
+            {
+                _agentCoordinator.SetAgentsUnassignable();
+                CurrentTeam = DateTime.Now.ToWorkShift().ToTeam();
+                SetupQueuesAndShifts();
+                BackgroundProcess_ShiftChange_LastRun = DateTime.Now;
+            }
+            _agentCoordinator.RemoveUnassignableAgents();
+        }
     }
 
     private void SetupQueuesAndShifts()
     {
-        CurrentTeam = GetTeam(_settings.ShiftSettings.IsAutoAssign);
-
         _agentCoordinator.AddAgents(CurrentTeam.Agents);
         _chatQueue.SetAgentsCapacity(_agentCoordinator.GetCapacity());
+    }
 
-        if (CurrentTeam.Shift == WorkShift.Day)
-        {
-            _supportCoordinator.AddAgents(WorkShift.Custom.ToTeam().Agents);
-            _supportQueue.SetAgentsCapacity(_supportCoordinator.GetCapacity());
-        }
-    }
-    private Team GetTeam(bool isAutoAssign)
-    {
-        return !isAutoAssign ? WorkShift.Day.ToTeam() : DateTime.Now.ToWorkShift().ToTeam();
-    }
 }

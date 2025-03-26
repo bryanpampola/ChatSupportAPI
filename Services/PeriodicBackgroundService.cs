@@ -52,6 +52,7 @@ public class PeriodicHostedService : BackgroundService
                     chatSupport.Utility_PingLiveSessions();
                     chatSupport.Utility_RemoveExpiredSessionOnQueue();
                     chatSupport.Utility_AssignWaitingSessionOnQueue();
+                    chatSupport.Utility_ChangeTeamBasedOnWorkshift();
 
                     // Sample count increment
                     _executionCount++;

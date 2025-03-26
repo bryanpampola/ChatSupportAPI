@@ -59,10 +59,10 @@ public static class Enums
 
     public enum WorkShift
     {
-        Day,
-        Evening,
-        Night,
-        Custom
+        Day = 1,
+        Evening = 2,
+        Night = 3,
+        Custom = 100
     }
 }
 

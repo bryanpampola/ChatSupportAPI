@@ -11,5 +11,6 @@ public interface IAgentCoordinatorService
     void UnassignChats(List<ChatSession> chats);
     int GetCapacity();
     List<string> GetInfo();
-    void RemoveCurrentAgents();
+    void SetAgentsUnassignable();
+    void RemoveUnassignableAgents();
 }

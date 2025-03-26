@@ -24,5 +24,6 @@ public class ChatQueueSettings
 public class ShiftSettings
 {
     public bool IsAutoAssign { get; set; }
+    public string DefaultShift { get; set; }
     public int CheckChange_InSeconds { get; set; }
 }
